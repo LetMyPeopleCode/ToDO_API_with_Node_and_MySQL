@@ -1,2 +1,12 @@
-# ToDO_API_with_Node_and_MySQL
-A ToDo API with MySQL for a Postman QuickStart
+# ToDos
+
+## OpenAPI 3.0 Generated NodeJS Express
+
+This project contains generated code from an OpenAPI 3 definition.
+The project integrate the NodeJS express library and is ready to run stand alone as a service.
+
+To run this project:
+```
+npm install
+npm run start
+```
