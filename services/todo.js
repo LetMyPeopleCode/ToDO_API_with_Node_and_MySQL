@@ -15,6 +15,7 @@ runQuery = function(query){
         function(err, rows){                                                
           if(rows === undefined){
             reject(new Error("Error rows is undefined"));
+            console.log(err);
           }else{
             resolve(rows);
           }
@@ -150,17 +151,54 @@ module.exports = {
     //
     // throw new Error('<Error message>'); // this will result in a 500
 
-    console.log(options);
+    let id_code = '';
+    var task = ''
+    var complete = '';
+ 
+    // validate for requiring an id code plus a task and/or completion
+    var params = options.putTodoInlineReqUrlencoded;
+    if(!params.id_code){
+      return {
+        status: 400,
+        data: {error : "An id_code is required."}
+      }
+    }
     
-    var data = {
-        "complete": "<Complete>",
-        "idcode": "<IdCode>",
-        "task": "<Task>",
-      },
-      status = '200';
+    if(!params.task && !params.complete){
+      return {
+        status: 400,
+        data: {error: "A task and/or a completion status is required."}
+      }
+    }
+
+    //compose the query values
+
+    id_code = connection.escape(params.id_code);
+
+    if(params.task){
+      task = "task = " + connection.escape(params.id_code);
+    }
+
+   // Set a boolean value for the completion status if it exists
+   if(params.complete) {
+    state = params.complete.toLowerCase();
+    if ((state === "true")||(state === 'false')){ 
+      state = (state === "true") ? true : false;
+      complete = (params.task) ? `, completed = ${state}` : `completed = ${state}`;
+    }
+   } 
+
+    // run the update
+   let query = `UPDATE todos SET ${task}${complete} WHERE id_code = ${id_code}`;
+   response = await runQuery(query);
+
+   // confirm the update
+   query = `SELECT * FROM todos WHERE id_code = ${id_code}`;
+   response = await runQuery(query);
+   data = response[0];
 
     return {
-      status: status,
+      status: 200,
       data: data
     };  
   },
