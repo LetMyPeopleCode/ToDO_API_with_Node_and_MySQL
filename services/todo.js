@@ -95,11 +95,9 @@ module.exports = {
       task = connection.escape(params.task); // escapes special characters 
     } else {
       // set bad request header and return error message
-      status = 400;
-      data = "You did not include a value for the task or it was too short/long (2-255 chars)."
       return {
-        status: status,
-        data: data
+        status: 400,
+        data: {error: "You did not include a value for the task or it was too short/long (2-255 chars)."}
       };  
     }
 
@@ -171,12 +169,19 @@ module.exports = {
       }
     }
 
+    if(params.task && !((params.task.length > 1) && (params.task.length < 256))){
+      return {
+        status: 400,
+        data: {error: "The task is not between 2-255 characters"}
+      }
+    }
+
     //compose the query values
 
     id_code = connection.escape(params.id_code);
 
     if(params.task){
-      task = "task = " + connection.escape(params.id_code);
+      task = "to_do = " + connection.escape(params.task);
     }
 
    // Set a boolean value for the completion status if it exists
