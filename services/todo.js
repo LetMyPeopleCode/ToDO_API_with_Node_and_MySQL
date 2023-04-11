@@ -48,7 +48,7 @@ module.exports = {
     
     //compose the query
     let query = "SELECT * FROM todos WHERE `completed` = 0";
-    if(options.completed && (options.completed.toLowerCase() === 'true'))
+    if(options.complete && (options.complete.toLowerCase() === 'true'))
     {
       query = "SELECT * FROM todos";
     }
@@ -65,7 +65,7 @@ module.exports = {
   /**
   * Create a to-do item.
 
-  * @param options.postTodoInlineReqUrlencoded.completeTrue means the task is complete, false means it is not.
+  * @param options.postTodoInlineReqUrlencoded.completed True means the task is complete, false means it is not.
   * @param options.postTodoInlineReqUrlencoded.task requiredText between 2 to 255 characters.
 
   */
@@ -87,7 +87,7 @@ module.exports = {
 
     let status = 200;
     let task = ''
-    let complete = false;
+    let completed = false;
     let params = options.postTodoInlineReqUrlencoded;
 
     // Make sure a task was submitted and is 2-355 characters
@@ -102,22 +102,22 @@ module.exports = {
     }
 
     // Set a value for the completion status - default is false
-    if (params.complete && (params.complete.toLowerCase() === 'true')){
-      complete = true;
+    if (params.completed && (params.completed.toLowerCase() === 'true')){
+      completed = true;
     } 
 
     // Generate a task ID
     let id_code = crypto.randomUUID();
 
     // compose the query & run it
-    let query = `INSERT INTO todos (id_code, to_do, completed) VALUES ('${id_code}', ${task}, ${complete})`;
+    let query = `INSERT INTO todos (id_code, to_do, completed) VALUES ('${id_code}', ${task}, ${completed})`;
     response = await runQuery(query);
 
     // compose the return value (if the query returned okay) 
     let todo = {
       "idcode": id_code,
       "task": task,
-      "complete": complete
+      "completed": completed
     }
 
     // return the response
@@ -151,7 +151,7 @@ module.exports = {
 
     let id_code = '';
     var task = ''
-    var complete = '';
+    var completed = '';
  
     // validate for requiring an id code plus a task and/or completion
     var params = options.putTodoInlineReqUrlencoded;
@@ -162,7 +162,7 @@ module.exports = {
       }
     }
     
-    if(!params.task && !params.complete){
+    if(!params.task && !params.completed){
       return {
         status: 400,
         data: {error: "A task and/or a completion status is required."}
@@ -185,11 +185,11 @@ module.exports = {
     }
 
    // Set a boolean value for the completion status if it exists
-   if(params.complete) {
-    state = params.complete.toLowerCase();
+   if(params.completed) {
+    state = params.completed.toLowerCase();
     if ((state === "true")||(state === 'false')){ 
       state = (state === "true") ? true : false;
-      complete = (params.task) ? `, completed = ${state}` : `completed = ${state}`;
+      completed = (params.task) ? `, completed = ${state}` : `completed = ${state}`;
     }
    } 
 
